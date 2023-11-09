@@ -14,16 +14,16 @@ public class PixAggregator {
     public void aggregator(StreamsBuilder streamsBuilder) {
 
         KStream<String, PixDTO> messageStream = streamsBuilder
-                .stream("pix-topic", Consumed.with(Serdes.String(), PixSerdes.serdes()))
+                .stream("astin04.poc-pix-topic", Consumed.with(Serdes.String(), PixSerdes.serdes()))
                 .peek((key, value) -> System.out.println("Pix recebido (Streams) (filter): " + value.getChaveOrigem()))
                 .filter((key, value) -> value.getValor() > 1000)
                 .peek((key, value) -> System.out.println("Pix: " + key + " será verificado para possível frause"));
 
         messageStream.print(Printed.toSysOut());
-        messageStream.to("pix-verificacao-fraude", Produced.with(Serdes.String(), PixSerdes.serdes()));
+        messageStream.to("astin04.poc-pix-verificacao-fraude", Produced.with(Serdes.String(), PixSerdes.serdes()));
 
         KTable<String, Double> aggregateStream = streamsBuilder
-                .stream("pix-topic-2", Consumed.with(Serdes.String(), PixSerdes.serdes()))
+                .stream("astin04.poc-pix-topic", Consumed.with(Serdes.String(), PixSerdes.serdes()))
                 .peek((key, value) -> System.out.println("Pix recebido (Streams) (Aggregatos): " + value.getChaveOrigem()))
                 .filter((key, value) -> value.getValor() != null)
                 .groupBy((key, value) -> value.getChaveOrigem())

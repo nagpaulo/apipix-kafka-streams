@@ -10,6 +10,7 @@ import com.alura.pix.repository.PixRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.annotation.RetryableTopic;
+import org.springframework.kafka.retrytopic.FixedDelayStrategy;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.stereotype.Service;
 
@@ -22,11 +23,12 @@ public class PixValidator {
     @Autowired
     private PixRepository pixRepository;
 
-    @KafkaListener(topics = "pix-topic", groupId = "grupo")
+    @KafkaListener(topics = "astin04.poc-pix-topic", groupId = "grupo")
     @RetryableTopic(
             backoff = @Backoff(value = 3000L),
             attempts = "5",
             autoCreateTopics = "true",
+            fixedDelayTopicStrategy = FixedDelayStrategy.SINGLE_TOPIC,
             include = KeyNotFoundException.class
     )
     public void processaPix(PixDTO pixDTO) {
@@ -39,8 +41,10 @@ public class PixValidator {
 
         if (origem == null || destino == null) {
             pix.setStatus(PixStatus.ERRO);
+            pixRepository.save(pix);
             throw new KeyNotFoundException();
         } else {
+            pixRepository.save(pix);
             pix.setStatus(PixStatus.PROCESSADO);
         }
         pixRepository.save(pix);

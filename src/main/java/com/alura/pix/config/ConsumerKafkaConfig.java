@@ -16,6 +16,7 @@ import org.springframework.kafka.annotation.KafkaStreamsDefaultConfiguration;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaStreamsConfiguration;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.streams.KafkaStreamsMicrometerListener;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
@@ -36,8 +37,8 @@ public class ConsumerKafkaConfig {
 
     @Bean(name = KafkaStreamsDefaultConfiguration.DEFAULT_STREAMS_CONFIG_BEAN_NAME)
     public KafkaStreamsConfiguration kafkaStreamConfig() {
-        Map props = new HashMap<>();
-        props.put(APPLICATION_ID_CONFIG , "kafka-streams-demo-6");
+        Map<String, Object> props = new HashMap<>();
+        props.put(APPLICATION_ID_CONFIG , "astin04.poc-kafka-streams-demo-6");
         props.put(BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         props.put(DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
         props.put(DEFAULT_VALUE_SERDE_CLASS_CONFIG, PixSerdes.class);
@@ -66,9 +67,10 @@ public class ConsumerKafkaConfig {
         props.put( ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put( ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
         props.put( JsonDeserializer.TRUSTED_PACKAGES, "*");
-//        props.put( ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
-//        props.put( ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-//        props.put( ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, false);
+        props.put( ConsumerConfig.MAX_POLL_INTERVAL_MS_CONFIG, 20000000);
+        props.put( ConsumerConfig.MAX_POLL_RECORDS_CONFIG, 100);
+        props.put( ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+        props.put( ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, false);
         return new DefaultKafkaConsumerFactory<>(props);
     }
 
